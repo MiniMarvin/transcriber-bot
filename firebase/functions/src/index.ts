@@ -80,7 +80,8 @@ async function convertAudio(uri: string, language: string): Promise<any> {
   const config = <const>{
     enableAutomaticPunctuation: true,
     encoding: "OGG_OPUS",
-    sampleRateHertz: 16000,
+    sampleRateHertz: 48000, //whatsapp
+    // sampleRateHertz: 16000, //whatsapp
     languageCode: language || "pt-BR",
     model: "default",
     // sampleRateHertz: 48000,
