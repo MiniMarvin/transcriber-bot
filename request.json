@@ -1,0 +1,12 @@
+{
+    "config": {
+        "encoding": "OGG_OPUS",
+        "sampleRateHertz": 16000,
+        "languageCode": "pt-BR",
+        "model": "default",
+        "enableAutomaticPunctuation": true
+    },
+    "audio": {
+        "uri": "gs://transcriber-bot-294600.appspot.com/WhatsApp Ptt 2020-11-09 at 08.18.04.ogg"
+    }
+}

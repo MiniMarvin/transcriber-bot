@@ -1,7 +1,11 @@
 import * as functions from "firebase-functions";
 // Imports the Google Cloud client library
 import speech from "@google-cloud/speech";
-import { firestore, storage } from "firebase-admin";
+import * as admin from "firebase-admin";
+
+// setup the default app for the firebase
+admin.initializeApp();
+
 // Creates a client
 const client = new speech.SpeechClient();
 
@@ -10,12 +14,36 @@ export const bucketHandler = functions.storage
   .onFinalize(async (object, context) => {
     if (object.contentType?.includes("audio")) {
       const uri = `gs://${object.bucket}/${object.name}`;
-      const result = await convertAudio(uri, "pt-BR");
+      functions.logger.info(uri);
 
-      await firestore().collection("audios").doc("id").set(result);
-      await storage()
-        .bucket(object.bucket)
-        .file(object.name ?? "").delete;
+      // const uri = `${object.selfLink}?alt=media&token=${object?.metadata?.firebaseStorageDownloadTokens}`;
+      // const audio = await admin
+      //   .storage()
+      //   .bucket(object.bucket)
+      //   .file(object.name ?? "")
+      //   .download();
+
+      const result = await convertAudio(uri, "pt-BR");
+      // const rawAudio = audio.map((buffer) => buffer.toString()).join("");
+      // functions.logger.info(rawAudio);
+
+      // const result = await convertRawAudio(rawAudio, "pt-BR");
+      functions.logger.info(result);
+
+      // try {
+      await admin
+        .firestore()
+        .collection("audios")
+        .doc(object.name ?? "")
+        .set(result);
+      // await admin
+      //   .storage()
+      //   .bucket(object.bucket)
+      //   .file(object.name ?? "")
+      //   .delete();
+      // } catch (err) {
+      //   functions.logger.error(err);
+      // }
     }
     functions.logger.info(JSON.stringify(object));
   });
@@ -47,9 +75,16 @@ async function convertAudio(uri: string, language: string): Promise<any> {
   const audio = {
     uri: uri,
   };
-  const config = {
-    languageCode: language,
-    enableWordTimeOffsets: true,
+  // Duration: 00:04:40.69, start: 0.006500, bitrate: 18 kb/s
+  // Stream #0:0: Audio: opus, 48000 Hz, mono, fltp
+  const config = <const>{
+    enableAutomaticPunctuation: true,
+    encoding: "OGG_OPUS",
+    sampleRateHertz: 48000, //whatsapp
+    // sampleRateHertz: 16000, //whatsapp
+    languageCode: language || "pt-BR",
+    model: "default",
+    // sampleRateHertz: 48000,
   };
   const request = {
     audio: audio,
@@ -58,6 +93,7 @@ async function convertAudio(uri: string, language: string): Promise<any> {
 
   // Detects speech in the audio file
   try {
+    // tslint:disable-next-line
     const [response] = await client.recognize(request);
     const transcription =
       response?.results?.length &&
@@ -73,3 +109,44 @@ async function convertAudio(uri: string, language: string): Promise<any> {
     return err;
   }
 }
+
+// async function convertRawAudio(
+//   rawAudio: string,
+//   language: string
+// ): Promise<any> {
+//   // The audio file's encoding, sample rate in hertz, and BCP-47 language code
+//   const audio = {
+//     content: rawAudio,
+//   };
+//   // Duration: 00:04:40.69, start: 0.006500, bitrate: 18 kb/s
+//   // Stream #0:0: Audio: opus, 48000 Hz, mono, fltp
+//   const config = <const>{
+//     enableAutomaticPunctuation: true,
+//     encoding: "LINEAR16",
+//     languageCode: language || "pt-BR",
+//     model: "default",
+//     sampleRateHertz: 48000,
+//   };
+//   const request = {
+//     audio: audio,
+//     config: config,
+//   };
+
+//   // Detects speech in the audio file
+//   try {
+//     // tslint:disable-next-line
+//     const [response] = await client.recognize(request);
+//     const transcription =
+//       response?.results?.length &&
+//       response?.results?.length > 0 &&
+//       response?.results
+//         ?.map(
+//           (result) => result?.alternatives && result?.alternatives[0].transcript
+//         )
+//         .join("\n");
+
+//     return { transcription, results: response?.results };
+//   } catch (err) {
+//     return err;
+//   }
+// }
