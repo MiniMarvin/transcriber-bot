@@ -1,0 +1,32 @@
+{
+  "name": "transcriber-bot",
+  "version": "1.0.0",
+  "description": "a bot that transcribes audio to text on telegram",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/MiniMarvin/transcriber-bot.git"
+  },
+  "keywords": [
+    "bot",
+    "machine-learning"
+  ],
+  "author": "many",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/MiniMarvin/transcriber-bot/issues"
+  },
+  "homepage": "https://github.com/MiniMarvin/transcriber-bot#readme",
+  "dependencies": {
+    "@google-cloud/firestore": "^4.7.1",
+    "@google-cloud/storage": "^5.5.0",
+    "fs": "0.0.1-security",
+    "node-fetch": "^2.6.1",
+    "node-telegram-bot-api": "^0.50.0",
+    "path": "^0.12.7",
+    "request": "^2.88.2"
+  }
+}
