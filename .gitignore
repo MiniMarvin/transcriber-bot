@@ -103,7 +103,7 @@ dist
 # TernJS port file
 .tern-port
 
-**/*transcriber-bot-*.json
+**/*tl-dl-bot-*.json
 **/*bot-key.json
 **/*keys.json
 **/*.ogg
