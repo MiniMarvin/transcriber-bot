@@ -7,6 +7,6 @@
         "enableAutomaticPunctuation": true
     },
     "audio": {
-        "uri": "gs://transcriber-bot-294600.appspot.com/t_audio.ogg"
+        "uri": "gs://transcriber-bot-294600.appspot.com/t_112233.ogg"
     }
 }

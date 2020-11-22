@@ -80,8 +80,8 @@ async function convertAudio(uri: string, language: string): Promise<any> {
   const config = <const>{
     enableAutomaticPunctuation: true,
     encoding: "OGG_OPUS",
-    sampleRateHertz: 48000, //whatsapp
-    // sampleRateHertz: 16000, //whatsapp
+    // sampleRateHertz: 48000, //whatsapp
+    sampleRateHertz: 16000, //whatsapp
     languageCode: language || "pt-BR",
     model: "default",
     // sampleRateHertz: 48000,
@@ -104,7 +104,35 @@ async function convertAudio(uri: string, language: string): Promise<any> {
         )
         .join("\n");
 
-    return { transcription, results: response?.results };
+    if (transcription) {
+      return { transcription, results: response?.results };
+    }
+
+    // retry another encoding
+
+    const config1 = <const>{
+      enableAutomaticPunctuation: true,
+      encoding: "OGG_OPUS",
+      // sampleRateHertz: 48000, //whatsapp
+      sampleRateHertz: 48000, //whatsapp
+      languageCode: language || "pt-BR",
+      model: "default",
+      // sampleRateHertz: 48000,
+    };
+    const request1 = {
+      audio: audio,
+      config: config1,
+    };
+    const [response1] = await client.recognize(request1);
+    const transcription1 =
+      response1?.results?.length &&
+      response1?.results?.length > 0 &&
+      response1?.results
+        ?.map(
+          (result) => result?.alternatives && result?.alternatives[0].transcript
+        )
+        .join("\n");
+    return { transcription: transcription1, results: response1?.results };
   } catch (err) {
     return err;
   }
